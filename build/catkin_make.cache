@@ -1,0 +1,2 @@
+bumperbot_controller:bumperbot_description:bumperbot_examples:bumperbot_localization
+-DCATKIN_DEVEL_PREFIX=/home/zq/bumperbot_ws/devel -DCMAKE_INSTALL_PREFIX=/home/zq/bumperbot_ws/install -G Unix Makefiles

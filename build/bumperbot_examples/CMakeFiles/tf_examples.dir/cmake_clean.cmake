@@ -1,0 +1,11 @@
+file(REMOVE_RECURSE
+  "/home/zq/bumperbot_ws/devel/lib/libtf_examples.pdb"
+  "/home/zq/bumperbot_ws/devel/lib/libtf_examples.so"
+  "CMakeFiles/tf_examples.dir/src/tf_examples.cpp.o"
+  "CMakeFiles/tf_examples.dir/src/tf_examples.cpp.o.d"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/tf_examples.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

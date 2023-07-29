@@ -1,0 +1,8 @@
+prefix=/home/zq/bumperbot_ws/devel
+
+Name: bumperbot_localization
+Description: Description of bumperbot_localization
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
