@@ -150,7 +150,6 @@
     <axis xyz="0 0 0" />
   </joint>
 
-
   <link name="imu_link">
     <inertial>
       <origin xyz="-0.00552433659106688 0.000168210391520346 0.000514000497342681" rpy="0 0 0" />
@@ -179,4 +178,5 @@
     <child link="imu_link" />
     <axis xyz="0 0 0" />
   </joint>
+
 </robot>

@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 import rospy
-from std_msgs.msg import Float64
-from geometry_msgs.msg import Twist
-from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
-import numpy as np
-from tf2_ros import TransformBroadcaster
+from sensor_msgs.msg import JointState
 from geometry_msgs.msg import TransformStamped
 import tf_conversions
+from tf2_ros import TransformBroadcaster
 import math
+import numpy as np
 
 
 class NoisyController(object):
@@ -23,8 +21,10 @@ class NoisyController(object):
         self.x_ = 0.0
         self.y_ = 0.0
         self.theta_ = 0.0
+        self.joint_sub_ = rospy.Subscriber("joint_states", JointState, self.jointCallback)        
+        self.odom_pub_ = rospy.Publisher("bumperbot_controller/odom_noisy", Odometry, queue_size=10)
 
-        # Fill the Odometry message with invariant parameters
+        # Fill the Odometry Noisy message with invariant parameters
         self.odom_msg_ = Odometry()
         self.odom_msg_.header.frame_id = "odom"
         self.odom_msg_.child_frame_id = "base_footprint_ekf"
@@ -32,34 +32,33 @@ class NoisyController(object):
         self.odom_msg_.pose.pose.orientation.y = 0.0
         self.odom_msg_.pose.pose.orientation.z = 0.0
         self.odom_msg_.pose.pose.orientation.w = 1.0
-        # Fill the TF message
+
+        # Fill the TF Noisy message
         self.br_ = TransformBroadcaster()
         self.transform_stamped_ = TransformStamped()
         self.transform_stamped_.header.frame_id = "odom"
         self.transform_stamped_.child_frame_id = "base_footprint_noisy"
+
         self.prev_time_ = rospy.Time.now()
 
-        self.joint_sub_ = rospy.Subscriber("joint_states", JointState, self.jointCallback)        
-        self.odom_pub_ = rospy.Publisher("bumperbot_controller/odom_noisy", Odometry, queue_size=10)
 
-
-
-    
     def jointCallback(self, msg):
-        wheel_encoder_left = msg.position[0]+np.random.normal(0, 0.005)
-        wheel_encoder_right = msg.position[1]+np.random.normal(0, 0.005)
-
         # Implements the inverse differential kinematic model
         # Given the position of the wheels, calculates their velocities
         # then calculates the velocity of the robot wrt the robot frame
         # and then converts it in the global frame and publishes the TF
+
+        # Add noise to wheel readings
+        wheel_encoder_left = msg.position[0] + np.random.normal(0, 0.005)
+        wheel_encoder_right = msg.position[1] + np.random.normal(0, 0.005)
+
         dp_left = wheel_encoder_left - self.left_wheel_prev_pos_
-        dp_right = wheel_encoder_right  - self.right_wheel_prev_pos_
+        dp_right = wheel_encoder_right - self.right_wheel_prev_pos_
         dt = (msg.header.stamp - self.prev_time_).to_sec()
 
         # Actualize the prev pose for the next itheration
-        self.left_wheel_prev_pos_ = msg.position[0]
-        self.right_wheel_prev_pos_ = msg.position[1]
+        self.left_wheel_prev_pos_ = wheel_encoder_left
+        self.right_wheel_prev_pos_ = wheel_encoder_right
         self.prev_time_ = msg.header.stamp
 
         # Calculate the rotational speed of each wheel
